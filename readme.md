@@ -55,7 +55,6 @@ This parameter is used to **enable ssl**
 **Ensure that the entrypoint is properly configured too :** 
 - traefik.http.routers.**[application_name]**.entrypoints=**websecure**
 
-
 ### AUTH (not required)
 Equivalent of .htaccess / .htpasswd
 - traefik.http.middlewares.**[application_name]**.basicauth.users=**[username:password,username:password,username:password ...]**
@@ -71,7 +70,7 @@ This parameter is used to **redirect http trafic to https** ; [application_name]
 
 - traefik.http.middlewares.httpsonly.redirectscheme.scheme=https
 - traefik.http.middlewares.httpsonly.redirectscheme.permanent=true
-- traefik.http.routers.httpsonly.rule=HostRegexp(`{any:.*}`)
+- traefik.http.routers.httpsonly.rule=HostRegexp(\`{any:.*}\`)
 - traefik.http.routers.httpsonly.middlewares=httpsonly
 
 
@@ -84,6 +83,13 @@ Ensure all containers have the netwok block :
     networks:
       - web
 ```
+
+
+
+## Troubleshooting
+### Error "SSL_ERROR_UNRECOGNIZED_NAME_ALERT" when using ssl
+- Ensure your certs are in the `certs/` directory
+- If you want to use traefik's self signed cert, remove/comment the `tls.yml` file
 
 ### Versions
 Developped with : 
