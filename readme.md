@@ -41,23 +41,22 @@ Feel free to add as much entrypoints as you need.
 ## Docker-compose labels
 Traefik use the labels to redirect flux ; in a same container, all labels must have the same **[application_name]**
 
-### BASIC PARAMS (required)
+### HTTP (required)
 This parameter is used to **set the url** (aka Vhost)
-- traefik.http.routers.**[application_name]**.rule=Host(\`**[url]**\`)
+- traefik.http.routers.**[application_name]**-http.rule=Host(\`**[url]**\`)
+- traefik.http.routers.**[application_name]**-http.entrypoints=**[http-entrypoint]**
 
-This parameter allow you to specify the **entrypoint** to use
-- traefik.http.routers.**[application_name]**.entrypoints=**[entrypoint]**
-
-### SSL (not required)
+### HTTPS (required)
 This parameter is used to **enable ssl**
-- traefik.http.routers.**[application_name]**.tls=true
-
-**Ensure that the entrypoint is properly configured too :** 
-- traefik.http.routers.**[application_name]**.entrypoints=**websecure**
+- traefik.http.routers.**[application_name]**-https.rule=Host(\`**[url]**\`)
+- traefik.http.routers.**[application_name]**-https.tls=true
+- traefik.http.routers.**[application_name]**-https.entrypoints=**[https-entrypoint]**
 
 ### AUTH (not required)
 Equivalent of .htaccess / .htpasswd
-- traefik.http.middlewares.**[application_name]**.basicauth.users=**[username:password,username:password,username:password ...]**
+- traefik.http.routers.**[application_name]**-http.middlewares=**[application_name]**auth
+- traefik.http.routers.**[application_name]**-https.middlewares=**[application_name]**-auth
+- traefik.http.middlewares.**[application_name]**-auth.basicauth.users=**[username:password,username:password,username:password ...]**
 
 - generate a login with the command `docker run --rm --name apache httpd:alpine htpasswd -nb username password`
 
@@ -65,13 +64,8 @@ Equivalent of .htaccess / .htpasswd
   - ✅ username**$$**data**$$**data
   - ❌ username**$**data**$**data
 
-### HTTPS REDIRECT (nor required)
-This parameter is used to **redirect http trafic to https** ; [application_name] is **NOT** required
-
-- traefik.http.middlewares.httpsonly.redirectscheme.scheme=https
-- traefik.http.middlewares.httpsonly.redirectscheme.permanent=true
-- traefik.http.routers.httpsonly.rule=HostRegexp(\`{any:.*}\`)
-- traefik.http.routers.httpsonly.middlewares=httpsonly
+### ENABLE HTTPS REDIRECT (not required)
+To enable http to https redirect, you have to uncomment this block in the `traefik.yml` file
 
 
 

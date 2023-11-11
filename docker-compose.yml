@@ -13,23 +13,20 @@ services:
       - "./config/traefik/:/etc/traefik/"
       - "./certs:/etc/certs/"
     labels:
-      # BASIC PARAMS
-      # - "traefik.enable=true"
-      - "traefik.http.routers.dashboard.rule=Host(`traefik.domain.local`)"
-      - "traefik.http.routers.dashboard.entrypoints=web"
+      # HTTP
+      - "traefik.http.routers.dashboard-http.rule=Host(`traefik.local`)"
+      - "traefik.http.routers.dashboard-http.entrypoints=web"
+      # HTTPS
+      - "traefik.http.routers.dashboard-https.rule=Host(`traefik.local`)"
+      - "traefik.http.routers.dashboard-https.entrypoints=websecure"
+      - "traefik.http.routers.dashboard-https.tls=true"      
        # API
-      - "traefik.http.routers.dashboard.service=api@internal"
-      # # SSL
-      # - "traefik.http.routers.dashboard.entrypoints=websecure"
-      # - "traefik.http.routers.dashboard.tls=true"
-      # # HTTPS REDIRECT
-      # - "traefik.http.middlewares.httpsonly.redirectscheme.scheme=https"
-      # - "traefik.http.middlewares.httpsonly.redirectscheme.permanent=true"
-      # - "traefik.http.routers.httpsonly.rule=HostRegexp(`{any:.*}`)"
-      # - "traefik.http.routers.httpsonly.middlewares=httpsonly"
+      - "traefik.http.routers.dashboard-http.service=api@internal"
+      - "traefik.http.routers.dashboard-https.service=api@internal"
       # AUTH
-      - "traefik.http.routers.dashboard.middlewares=traefik-auth"
-      - "traefik.http.middlewares.traefik-auth.basicauth.users={{ user:password }}"
+      - "traefik.http.routers.dashboard-http.middlewares=dashboard-auth"
+      - "traefik.http.routers.dashboard-https.middlewares=dashboard-auth"
+      - "traefik.http.middlewares.dashboard-auth.basicauth.users={{ user:password }}"
     networks:
       - web
 
@@ -50,20 +47,17 @@ services:
       - CATALOG_ELEMENTS_LIMIT=1000
     container_name: registry-ui
     labels:
-      # BASIC PARAMS
-      - "traefik.http.routers.registry-ui.rule=Host(`registry-ui.domain.local`)"
-      - "traefik.http.routers.registry-ui.entrypoints=web"
-      # # SSL
-      # - "traefik.http.routers.registry-ui.entrypoints=websecure"
-      # - "traefik.http.routers.registry-ui.tls=true"
-      # # HTTPS REDIRECT
-      # - "traefik.http.middlewares.httpsonly.redirectscheme.scheme=https"
-      # - "traefik.http.middlewares.httpsonly.redirectscheme.permanent=true"
-      # - "traefik.http.routers.httpsonly.rule=HostRegexp(`{any:.*}`)"
-      # - "traefik.http.routers.httpsonly.middlewares=httpsonly"
+      # HTTP
+      - "traefik.http.routers.registry-ui-http.rule=Host(`registry-ui.local`)"
+      - "traefik.http.routers.registry-ui-http.entrypoints=web"
+      # HTTPS
+      - "traefik.http.routers.registry-ui-https.rule=Host(`registry-ui.local`)"
+      - "traefik.http.routers.registry-ui-https.entrypoints=websecure"
+      - "traefik.http.routers.registry-ui-https.tls=true"      
       # AUTH
-      - "traefik.http.routers.registry-ui.middlewares=auth"
-      - "traefik.http.middlewares.auth.basicauth.users={{ user:password }}"
+      - "traefik.http.routers.registry-ui-http.middlewares=registry-ui-auth"
+      - "traefik.http.routers.registry-ui-https.middlewares=registry-ui-auth"
+      - "traefik.http.middlewares.registry-ui-auth.basicauth.users=mdurand:{{ user:password }}"
     networks:
       - web
 
@@ -82,17 +76,13 @@ services:
       - ./registry/data:/var/lib/registry
     container_name: registry-server
     labels:
-      # BASIC PARAMS
-      - "traefik.http.routers.registry.rule=Host(`registry.domain.local`)"
-      - "traefik.http.routers.registry.entrypoints=web"
-      # # SSL
-      # - "traefik.http.routers.registry.entrypoints=websecure"
-      # - "traefik.http.routers.registry.tls=true"
-      # # HTTPS REDIRECT
-      # - "traefik.http.middlewares.httpsonly.redirectscheme.scheme=https"
-      # - "traefik.http.middlewares.httpsonly.redirectscheme.permanent=true"
-      # - "traefik.http.routers.httpsonly.rule=HostRegexp(`{any:.*}`)"
-      # - "traefik.http.routers.httpsonly.middlewares=httpsonly"
+      # HTTP
+      - "traefik.http.routers.registry-http.rule=Host(`registry.local`)"
+      - "traefik.http.routers.registry-http.entrypoints=web"
+      # HTTPS
+      - "traefik.http.routers.registry-https.rule=Host(`registry.local`)"
+      - "traefik.http.routers.registry-https.entrypoints=websecure"
+      - "traefik.http.routers.registry-https.tls=true"      
     networks:
       - web
 
