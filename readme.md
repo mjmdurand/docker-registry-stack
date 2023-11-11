@@ -15,8 +15,8 @@ You can provide SSL certs and restrict access to each managed container.
 - certs **must be in .pem**
 - set your own labels in the `docker-compose.yml` file.
 - create the networks : 
-  - docker network create web
-  - docker network create internal
+  - `docker network create web`
+  - `docker network create internal`
 
 
 ## Install/Launch
