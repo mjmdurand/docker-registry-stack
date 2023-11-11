@@ -14,7 +14,9 @@ You can provide SSL certs and restrict access to each managed container.
 - put your certs in the `certs/` directory (certs/domain.pem, certs/domain.pem) and edit `config/dynamic/tls.yml` (you can edit it when then container is running).
 - certs **must be in .pem**
 - set your own labels in the `docker-compose.yml` file.
-
+- create the networks : 
+  - docker network create web
+  - docker network create internal
 
 
 ## Install/Launch
