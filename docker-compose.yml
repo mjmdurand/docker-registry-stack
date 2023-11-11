@@ -57,7 +57,7 @@ services:
       # AUTH
       - "traefik.http.routers.registry-ui-http.middlewares=registry-ui-auth"
       - "traefik.http.routers.registry-ui-https.middlewares=registry-ui-auth"
-      - "traefik.http.middlewares.registry-ui-auth.basicauth.users=mdurand:{{ user:password }}"
+      - "traefik.http.middlewares.registry-ui-auth.basicauth.users={{ user:password }}"
     networks:
       - web
 
