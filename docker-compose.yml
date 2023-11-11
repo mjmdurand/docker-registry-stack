@@ -10,7 +10,7 @@ services:
       - "8080:8080"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./traefik/:/etc/traefik/"
+      - "./config/traefik/:/etc/traefik/"
       - "./certs:/etc/certs/"
     labels:
       # BASIC PARAMS
@@ -49,8 +49,6 @@ services:
       - REGISTRY_SECURED=false
       - CATALOG_ELEMENTS_LIMIT=1000
     container_name: registry-ui
-    volumes:
-      - ./.htpasswd:/usr/share/nginx/.htpasswd
     labels:
       # BASIC PARAMS
       - "traefik.http.routers.registry-ui.rule=Host(`registry-ui.domain.local`)"
