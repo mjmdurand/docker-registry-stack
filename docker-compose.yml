@@ -16,7 +16,7 @@ services:
       # BASIC PARAMS
       # - "traefik.enable=true"
       - "traefik.http.routers.dashboard.rule=Host(`traefik.domain.local`)"
-      - "traefik.http.routers.registry.entrypoints=web"
+      - "traefik.http.routers.dashboard.entrypoints=web"
        # API
       - "traefik.http.routers.dashboard.service=api@internal"
       # # SSL
@@ -52,7 +52,7 @@ services:
     labels:
       # BASIC PARAMS
       - "traefik.http.routers.registry-ui.rule=Host(`registry-ui.domain.local`)"
-      - "traefik.http.routers.registry.entrypoints=web"
+      - "traefik.http.routers.registry-ui.entrypoints=web"
       # # SSL
       # - "traefik.http.routers.registry-ui.entrypoints=websecure"
       # - "traefik.http.routers.registry-ui.tls=true"
