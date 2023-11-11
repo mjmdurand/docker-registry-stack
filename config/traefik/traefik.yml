@@ -1,0 +1,25 @@
+providers:
+  file:
+    directory: /etc/traefik/dynamic
+    watch: true
+
+  docker:
+    defaultRule: Host(`{{ index .Labels "com.docker.compose.service" }}.{{ index .Labels "com.docker.compose.project" }}.localhost`)
+    watch: true
+    network: "web"
+
+entryPoints:
+  web:
+    address: :80
+  websecure:
+    address: :443
+
+api:
+  dashboard: true
+
+global:
+  sendAnonymousUsage: false
+
+log:
+  level: DEBUG
+  format: common

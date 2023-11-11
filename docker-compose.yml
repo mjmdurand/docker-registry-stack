@@ -1,0 +1,105 @@
+version: '3.8'
+services:
+  reverse-proxy:
+    restart: always
+    image: traefik
+    container_name: reverse-proxy
+    ports:
+      - "443:443"
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./traefik/:/etc/traefik/"
+      - "./certs:/etc/certs/"
+    labels:
+      # BASIC PARAMS
+      # - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.domain.local`)"
+      - "traefik.http.routers.registry.entrypoints=webs"
+       # API
+      - "traefik.http.routers.dashboard.service=api@internal"
+      # # SSL
+      # - "traefik.http.routers.dashboard.entrypoints=websecure"
+      # - "traefik.http.routers.dashboard.tls=true"
+      # # HTTPS REDIRECT
+      # - "traefik.http.middlewares.httpsonly.redirectscheme.scheme=https"
+      # - "traefik.http.middlewares.httpsonly.redirectscheme.permanent=true"
+      # - "traefik.http.routers.httpsonly.rule=HostRegexp(`{any:.*}`)"
+      # - "traefik.http.routers.httpsonly.middlewares=httpsonly"
+      # AUTH
+      - "traefik.http.routers.dashboard.middlewares=traefik-auth"
+      - "traefik.http.middlewares.traefik-auth.basicauth.users={{ user:password }}"
+    networks:
+      - web
+
+  registry-ui:
+    image: joxit/docker-registry-ui:main
+    restart: always
+    environment:
+      - SINGLE_REGISTRY=true
+      - REGISTRY_TITLE=Docker Registry UI
+      - DELETE_IMAGES=true
+      - SHOW_CONTENT_DIGEST=true
+      - NGINX_PROXY_PASS_URL=http://registry-server:5000
+      - SHOW_CATALOG_NB_TAGS=true
+      - CATALOG_MIN_BRANCHES=1
+      - CATALOG_MAX_BRANCHES=1
+      - TAGLIST_PAGE_SIZE=100
+      - REGISTRY_SECURED=false
+      - CATALOG_ELEMENTS_LIMIT=1000
+    container_name: registry-ui
+    volumes:
+      - ./.htpasswd:/usr/share/nginx/.htpasswd
+    labels:
+      # BASIC PARAMS
+      - "traefik.http.routers.registry-ui.rule=Host(`registry-ui.domain.local`)"
+      - "traefik.http.routers.registry.entrypoints=web"
+      # # SSL
+      # - "traefik.http.routers.registry-ui.entrypoints=websecure"
+      # - "traefik.http.routers.registry-ui.tls=true"
+      # # HTTPS REDIRECT
+      # - "traefik.http.middlewares.httpsonly.redirectscheme.scheme=https"
+      # - "traefik.http.middlewares.httpsonly.redirectscheme.permanent=true"
+      # - "traefik.http.routers.httpsonly.rule=HostRegexp(`{any:.*}`)"
+      # - "traefik.http.routers.httpsonly.middlewares=httpsonly"
+      # AUTH
+      - "traefik.http.routers.registry-ui.middlewares=auth"
+      - "traefik.http.middlewares.auth.basicauth.users={{ user:password }}"
+    networks:
+      - web
+
+  registry-server:
+    image: registry:2.8.2
+    restart: always
+    environment:
+      REGISTRY_HTTP_HEADERS_Access-Control-Allow-Origin: '[http://registry.example.com]'
+      REGISTRY_HTTP_HEADERS_Access-Control-Allow-Methods: '[HEAD,GET,OPTIONS,DELETE]'
+      REGISTRY_HTTP_HEADERS_Access-Control-Allow-Credentials: '[true]'
+      REGISTRY_HTTP_HEADERS_Access-Control-Allow-Headers: '[Authorization,Accept,Cache-Control]'
+      REGISTRY_HTTP_HEADERS_Access-Control-Expose-Headers: '[Docker-Content-Digest]'
+      REGISTRY_STORAGE_DELETE_ENABLED: 'true'
+
+    volumes:
+      - ./registry/data:/var/lib/registry
+    container_name: registry-server
+    labels:
+      # BASIC PARAMS
+      - "traefik.http.routers.registry.rule=Host(`registry.domain.local`)"
+      - "traefik.http.routers.registry.entrypoints=web"
+      # # SSL
+      # - "traefik.http.routers.registry.entrypoints=websecure"
+      # - "traefik.http.routers.registry.tls=true"
+      # # HTTPS REDIRECT
+      # - "traefik.http.middlewares.httpsonly.redirectscheme.scheme=https"
+      # - "traefik.http.middlewares.httpsonly.redirectscheme.permanent=true"
+      # - "traefik.http.routers.httpsonly.rule=HostRegexp(`{any:.*}`)"
+      # - "traefik.http.routers.httpsonly.middlewares=httpsonly"
+    networks:
+      - web
+
+networks:
+  web:
+    external: true
+  internal:
+    external: false
